@@ -7,9 +7,10 @@
 ## tinytreads — a scraper fleet run like an engineering org
 
 A sneaker-deal aggregator fed by a fleet of scrapers across retailers with
-serious anti-bot stacks, orchestrated with Claude Code at high throughput —
-the logbook records 23 PRs shipped across a two-day window
-([sources/tinytreads-pulse-excerpt.md](sources/tinytreads-pulse-excerpt.md)).
+serious anti-bot stacks, built and hardened over months and orchestrated
+with Claude Code. One logged two-day sprint shipped 23 PRs
+([sources/tinytreads-pulse-excerpt.md](sources/tinytreads-pulse-excerpt.md))
+— that burst is a snapshot of the cadence, not the length of the project.
 What makes it relevant here is the discipline visible in a single day's
 log:
 
