@@ -6,10 +6,14 @@ and when the session ends each git project gets a dated entry in its own `CHANGE
 (commits, files changed, a one-line note), newest first, mirrored into the vault so
 `/brain` can search it. A nightly job rebuilds a clean session index.
 
-It also installs the core skills (**brain**, **agent-watchdog** for stalled/off-track
-sub-agents, **council-simulation** and **debugging-council** for adversarial second
-opinions) and the mandatory **no-inference protocol** (`NO-INFERENCE.md`, auto-loaded via
-a root `CLAUDE.md`) so cited / academic / legal work cannot fabricate.
+It also installs the kit, in tiers: **core** (brain, plus **agent-watchdog** which now
+gates every sub-agent spawn), **default** (council-simulation for adversarial second
+opinions), and **optional** (debugging-council, added with `BRAIN_SETUP_SKILLS=all`).
+The mandatory **no-inference protocol** (`NO-INFERENCE.md`) is auto-loaded via a root
+`CLAUDE.md`, and a **PreToolUse agent gate** enforces it deterministically: a spawn that
+asks an agent to do banned pipeline work (source extraction, calibration, citation
+audits) is refused with the reason, and research spawns missing a no-inference brief get
+a warning. Disable per-session with `AGENT_GATE=0`.
 
 It is honest by construction: entries record only what is verifiable (git commits, file
 counts, timestamps). It never invents outcomes, and machine entries are tagged
@@ -33,14 +37,13 @@ Replace the path with wherever you want your vault. That is the whole install. T
 bash uninstall.sh "$HOME/Documents/Knowledge"
 ```
 
-## Option B: let Claude do it
+## Option B (recommended): run the installer, then the onboarding wizard
 
-Open Claude Code in this folder and paste:
-
-> Read `setup/setup.sh` and run it with my vault at `~/Documents/Knowledge` (change the
-> path if I say otherwise). Then confirm the SessionEnd hook is wired in
-> `~/.claude/settings.json`, the launchd job `com.<vault>.brain-autolog` is loaded, and
-> the vault skeleton exists. Do not touch any unrelated hook.
+Run Option A's one command, then open Claude Code in your vault and paste the block from
+**`ONBOARD.md`**. Claude interviews you (field, goals, subfolders, tracking, citation
+strictness, the new-file extraction rule) and writes a vault personalized to you: a
+tailored root `CLAUDE.md`, per-research-folder rules, and registered projects. This
+replaces filling templates by hand.
 
 ---
 

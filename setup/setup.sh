@@ -28,15 +28,25 @@ echo "▶ Knowledge-vault setup (auto-log + core skills + no-inference protocol)
 say "vault:  $VAULT"
 say "skills: $SKILLS_DIR"
 
-# 1) Install / update all bundled skills (preserve any existing state files) --
+# 1) Install / update bundled skills, honoring the kit tiers ------------------
+# Core (always): brain, agent-watchdog. Default: council-simulation.
+# Optional: debugging-council. Select via BRAIN_SETUP_SKILLS:
+#   unset            -> core + council-simulation
+#   "all"            -> every bundled skill
+#   "brain foo bar"  -> core enforced + the named extras
+selected="${BRAIN_SETUP_SKILLS:-brain agent-watchdog council-simulation}"
+[[ "$selected" == "all" ]] && selected="$(cd "$HERE/skills" && ls -d */ | tr -d '/' | tr '\n' ' ')"
+case " $selected " in *" brain "*) ;; *) selected="brain $selected";; esac
+case " $selected " in *" agent-watchdog "*) ;; *) selected="agent-watchdog $selected";; esac
 mkdir -p "$SKILLS_DIR"
-for src in "$HERE"/skills/*/; do
-  name=$(basename "$src")
+for name in $selected; do
+  src="$HERE/skills/$name/"
+  [[ -d "$src" ]] || { say "skip unknown skill: $name"; continue; }
   dst="$SKILLS_DIR/$name"
   if command -v rsync >/dev/null 2>&1; then rsync -a "$src" "$dst/"; else mkdir -p "$dst" && cp -R "$src." "$dst/"; fi
   chmod +x "$dst"/hooks/*.sh "$dst"/scripts/*.sh 2>/dev/null || true
 done
-say "installed skills: $(cd "$HERE/skills" && ls -d */ | tr -d '/' | tr '\n' ' ')"
+say "installed skills: $selected"
 
 # 2) Vault skeleton ----------------------------------------------------------
 mkdir -p "$VAULT/repos" "$VAULT/inbox" "$VAULT/_meta"
@@ -61,18 +71,20 @@ elif ! grep -q "NO-INFERENCE.md" "$CLAUDEMD"; then
   say "NOTE: add a line '@NO-INFERENCE.md' to your existing $CLAUDEMD so it loads every session"
 fi
 
-# 3) Wire the SessionEnd hook (supersede the old pending-draft hook) ----------
+# 3) Wire hooks: SessionEnd auto-log + PreToolUse agent gate ------------------
+GATE_CMD="\$HOME/.claude/skills/agent-watchdog/scripts/agent_gate.sh"
 mkdir -p "$HOME/.claude"
-python3 - "$SETTINGS" "$HOOK_CMD" <<'PY'
+python3 - "$SETTINGS" "$HOOK_CMD" "$GATE_CMD" <<'PY'
 import json, os, sys
-path, cmd = sys.argv[1], sys.argv[2]
+path, cmd, gate = sys.argv[1], sys.argv[2], sys.argv[3]
 try:
     with open(path) as f: cfg = json.load(f)
 except (FileNotFoundError, json.JSONDecodeError):
     cfg = {}
 hooks = cfg.setdefault("hooks", {})
+
+# SessionEnd: drop the old pending-draft hook and any prior autolog entry.
 lst = hooks.setdefault("SessionEnd", [])
-# Drop the old pending-draft hook and any prior autolog entry (supersede).
 def keep(group):
     for h in group.get("hooks", []):
         c = h.get("command", "")
@@ -82,9 +94,18 @@ def keep(group):
 lst = [g for g in lst if keep(g)]
 lst.append({"matcher": "*", "hooks": [{"type": "command", "command": cmd}]})
 hooks["SessionEnd"] = lst
+print("  wired SessionEnd -> session_autolog.sh (superseded any pending-draft hook)")
+
+# PreToolUse: the agent gate, deterministic no-inference enforcement on every
+# sub-agent spawn (matcher covers both Task and Agent tool names).
+pre = hooks.setdefault("PreToolUse", [])
+pre = [g for g in pre if not any("agent_gate.sh" in h.get("command","") for h in g.get("hooks", []))]
+pre.append({"matcher": "Task|Agent", "hooks": [{"type": "command", "command": gate}]})
+hooks["PreToolUse"] = pre
+print("  wired PreToolUse (Task|Agent) -> agent_gate.sh (blocks banned pipeline spawns)")
+
 with open(path, "w") as f:
     json.dump(cfg, f, indent=2); f.write("\n")
-print("  wired SessionEnd -> session_autolog.sh (superseded any pending-draft hook)")
 PY
 
 # 4) Nightly polish via launchd (macOS), neutral label -----------------------

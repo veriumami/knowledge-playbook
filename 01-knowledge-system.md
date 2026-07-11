@@ -82,10 +82,19 @@ job that rebuilds a clean `SESSION_INDEX.md`. Entries record only verifiable mat
 never invents outcomes and your own edits stay separate. New projects self-register the
 first time you work in them.
 
-This is the runnable part of the vault: [`setup/`](setup/SETUP.md) installs the skill,
-wires the hook, and schedules the nightly polish with one command
+This is the runnable part of the vault: [`setup/`](setup/SETUP.md) installs the kit,
+wires the hooks, and schedules the nightly polish with one command
 (`bash setup/setup.sh <vault-path>`), reversible via `setup/uninstall.sh`. macOS today;
 Linux needs a cron/systemd timer for the polish.
+
+Two more properties are wired in, not hoped for. An **agent gate** (a PreToolUse hook)
+runs on every sub-agent spawn: work the no-inference protocol bans delegating (source
+extraction, calibration, citation audits) is refused with the reason, and research
+spawns missing a no-inference brief get a warning. And the vault is **personalized by
+interview, not template**: [`setup/ONBOARD.md`](setup/ONBOARD.md) has Claude ask about
+your field, goals, subfolders, tracking, and citation strictness, then write your root
+`CLAUDE.md` and per-research-folder rules from your answers, with the extraction ritual's
+examples tailored to your field and the rules kept verbatim.
 
 ## What is deliberately absent
 

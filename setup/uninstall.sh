@@ -18,17 +18,19 @@ path = sys.argv[1]
 try:
     with open(path) as f: cfg = json.load(f)
 except Exception: sys.exit(0)
-lst = cfg.get("hooks", {}).get("SessionEnd", [])
-def keep(group):
-    return not any("session_autolog.sh" in h.get("command","") for h in group.get("hooks", []))
-new = [g for g in lst if keep(g)]
-if "hooks" in cfg:
-    if new: cfg["hooks"]["SessionEnd"] = new
-    else: cfg["hooks"].pop("SessionEnd", None)
-    if not cfg["hooks"]: cfg.pop("hooks", None)
+def strip(event, needle):
+    lst = cfg.get("hooks", {}).get(event, [])
+    new = [g for g in lst
+           if not any(needle in h.get("command","") for h in g.get("hooks", []))]
+    if "hooks" in cfg:
+        if new: cfg["hooks"][event] = new
+        else: cfg["hooks"].pop(event, None)
+strip("SessionEnd", "session_autolog.sh")
+strip("PreToolUse", "agent_gate.sh")
+if not cfg.get("hooks"): cfg.pop("hooks", None)
 with open(path, "w") as f:
     json.dump(cfg, f, indent=2); f.write("\n")
-print("  removed session_autolog.sh from SessionEnd")
+print("  removed session_autolog.sh (SessionEnd) + agent_gate.sh (PreToolUse)")
 PY
 fi
 

@@ -35,6 +35,10 @@ If the agent has produced correct partial work that just needs finishing, take o
 
 Two rules, applied to every agent before its work is trusted. Both come straight from the vault's `NO-INFERENCE.md`.
 
+### 0. The deterministic layer: the spawn gate (no model discretion)
+
+Where the vault was installed with `setup.sh`, enforcement does not rely on this skill being invoked at all: a **PreToolUse hook** (`scripts/agent_gate.sh`, matcher `Task|Agent`) runs on every sub-agent spawn. Banned pipeline work in the spawn prompt (source extraction, calibration, citation/data audits, cited-text writing) is **refused** with the reason fed back; research-flavored spawns missing a no-inference brief get a **warning** and proceed. Session escape hatch: `AGENT_GATE=0`. The sections below are the judgment layer on top of that hard floor.
+
 ### 1. Enforce the agent ban in the verification pipeline
 
 The protocol is explicit: for work where a silent error is unaffordable, **do not use agents at all**, do it in the main thread where every step is visible. So before accepting any agent, classify what it was spawned to do:
