@@ -1,11 +1,13 @@
 ---
 name: agent-watchdog
-description: Check on background agents, bash jobs, and zombie processes. Use proactively when 2+ agents are in flight, user asks for status, after a long gap since the last tool call, or before ending a session. Detects stalled agents (>20 min idle), zombie nodriver/python processes, and runaway background bash jobs. Prefers investigate-and-nudge over kill-and-restart — the user has been explicit that unfinished work is usually salvageable. Run automatically at session-start when continuing prior work.
+description: Check on background agents, bash jobs, and zombie processes, AND enforce the no-inference protocol on agents. Use proactively when 2+ agents are in flight, user asks for status, after a long gap since the last tool call, or before ending a session. Detects stalled agents (>20 min idle), zombie nodriver/python processes, and runaway background bash jobs. Also enforces no-inference: flags agents spawned for verification/academic pipeline work (where the protocol bans agents) and scans agent deliverables for uncited claims before they can reach a source-of-truth document. Prefers investigate-and-nudge over kill-and-restart — the user has been explicit that unfinished work is usually salvageable. Run automatically at session-start when continuing prior work.
 ---
 
 # Agent Watchdog
 
-A lightweight operational skill for spotting stalled background work and deciding whether to nudge, kill, or manually complete it. Built after S9-CI-FIX-01 silently stalled for 58 min while its edits were correct and just needed committing.
+A skill for keeping background work both *alive* and *honest*: spotting stalled work and deciding whether to nudge, kill, or manually complete it, and enforcing the no-inference protocol on the agents themselves. Built after S9-CI-FIX-01 silently stalled for 58 min while its edits were correct and just needed committing.
+
+In a vault built on the no-inference protocol, liveness is only half the job. A stalled agent wastes time; an agent that fabricates a citation poisons every later session that reads its output. The compliance half (below) is what makes this skill worth having next to the protocol.
 
 ## When to invoke
 
@@ -28,6 +30,29 @@ Never TaskStop an agent just because it's idle. Investigate first:
 4. Is the prompt it's executing solvable, or is there a blocker it can't see (e.g., CI env issue it can't reproduce locally)?
 
 If the agent has produced correct partial work that just needs finishing, take over manually. That's usually cheaper than respawning.
+
+## No-inference enforcement (the point of running this in a research vault)
+
+Two rules, applied to every agent before its work is trusted. Both come straight from the vault's `NO-INFERENCE.md`.
+
+### 1. Enforce the agent ban in the verification pipeline
+
+The protocol is explicit: for work where a silent error is unaffordable, **do not use agents at all**, do it in the main thread where every step is visible. So before accepting any agent, classify what it was spawned to do:
+
+- **Allowed**: read-only research, landscape/library surveys, code search, evidence-mining that returns cited findings for later verification.
+- **Banned**: extracting a source into a markdown, calibrating a parameter, running a citation or data-lineage audit, or writing anything that will itself be cited. If an agent is doing this, that is the finding: stop it, and move the work to the main thread. Do not "rescue" its output into a source-of-truth file.
+
+A banned-work agent is a 🚫 `off-protocol` condition, and it outranks a stall. Report it even if the agent is happily "active."
+
+### 2. Citation discipline on the output agents ARE allowed to produce
+
+Nothing an agent asserts reaches a source-of-truth document until it is verified. When a permitted agent returns a deliverable (a report, or a markdown it wrote), run `scripts/compliance_scan.sh <file>` on that file, not on its JSONL. It is grep/wc only, so it never overflows context, and returns red-flag counts:
+
+- claim-like lines with no adjacent citation or source pointer,
+- absence of the VERIFIED / PARTIAL / NOT VERIFIED vocabulary where the task required it,
+- a high claim-to-citation ratio (assertions outrunning evidence).
+
+The scan **flags, it does not certify.** A flag means treat the whole deliverable as NOT VERIFIED until a main-thread citation audit clears it, which is just the protocol's own default applied to agents. A clean scan is necessary, not sufficient: still audit anything that will be cited.
 
 ## The probe (safe, no context overflow)
 
@@ -62,6 +87,19 @@ For each agent flagged `stuck`:
     (so future sessions learn the failure mode)
 ```
 
+Run this in parallel, for **every agent that has returned a deliverable** (not just stuck ones):
+
+```
+├── Is the agent doing banned pipeline work (extraction / calibration / citation
+│   or data audit / anything that will be cited)?
+│   └── Yes → 🚫 off-protocol. Stop it. Do NOT merge its output. Redo in main thread.
+│
+└── Allowed work → run scripts/compliance_scan.sh on its deliverable.
+    ├── FLAG → treat the whole deliverable as NOT VERIFIED; require a main-thread
+    │          citation audit (or discard) before any of it lands in a source doc.
+    └── OK   → still audit anything that will be cited; clean scan ≠ certified.
+```
+
 ## Zombie sweep
 
 Nodriver browsers, orphaned Python processes, and runaway background bash commands can pile up. Sweep at the same time as agent checks.
@@ -82,6 +120,7 @@ See `scripts/zombie_sweep.sh`.
 - Do not TaskStop an agent just because it's slow — only after investigation
 - Do not read an agent's full `.output` JSONL file — it will overflow context (the `wc`, `stat`, and `tail -1` commands are fine)
 - Do not auto-respawn a failed agent with the exact same prompt — include new context about why the first run failed, or you'll just reproduce the same stall
+- Do not merge, quote, or "rescue" an agent's output into a source-of-truth document if it was doing banned pipeline work, or if its compliance scan FLAGs, until a main-thread citation audit clears it. A live agent producing confident, uncited claims is a worse outcome than a dead one
 
 ## Output format
 
@@ -94,11 +133,15 @@ When the watchdog runs, produce a compact report to the user:
 |---|---|---|---|
 | S9-... | 3m  | ✅ active | making progress |
 | S9-... | 24m | 🚨 stuck  | partial edits visible on <file>; recommend manual completion |
+| S9-... | 8m  | 🚫 off-protocol | doing citation extraction (banned); stop, redo in main thread |
+| S9-... | done | ⚠️ FLAG | deliverable has 14 claims, 0 citations; NOT VERIFIED until audited |
 
 Zombies: 0 (or N — with kill recommendation)
 
 Action: [specific next step, 1-2 sentences]
 ```
+
+The compliance rows (🚫 off-protocol, ⚠️ FLAG) come first when present — an unverified claim heading for a source doc is more urgent than a stall.
 
 Lead with the action — the user cares about what to do next, not a log dump.
 
