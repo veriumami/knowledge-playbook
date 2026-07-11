@@ -15,13 +15,15 @@ from the tree.
 
 | Check | Verified | Mismatch |
 |---|---:|---:|
-| Internal markdown links (relative paths, incl. `sources/`) | 133 | 0 |
+| Internal markdown links (relative paths, incl. `sources/`) | 137 | 0 |
 | `sources/README.md` manifest entries exist | 20 | 0 |
-| GitHub blob citations on the portfolio site HTML | 15 | 0 |
-| **Total** | **168** | **0** |
+| GitHub blob citations on the portfolio site HTML | 21 | 0 |
+| **Total** | **178** | **0** |
 
 Every "source →" link on the site and every cross-link in the docs points
-at a file that exists in this repo.
+at a file that exists in this repo. The portfolio site now spans eight pages
+(home, method, playbook, projects hub, three project detail pages, and the
+graph), all re-audited on 2026-07-10.
 
 ## Figure spot-checks (quoted claim → present in source copy)
 
