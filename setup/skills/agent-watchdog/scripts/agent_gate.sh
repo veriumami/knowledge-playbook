@@ -80,7 +80,7 @@ if [[ -n "$pipeline" ]]; then
   if [[ "$rail_brief" -eq 1 && "$rail_chunk" -eq 1 && "$rail_verify" -eq 1 ]]; then
     : # fully railed ingestion spawn: allowed
   else
-    echo "AGENT GATE: blocked. This spawn delegates $pipeline without the full INGEST.md rails. Missing:$(missing_rails). Re-spawn with the protocol brief verbatim, a single-chunk scope (chunk id + page range), and the independent-verification requirement, or do the work in the main thread. See setup/INGEST.md. Session override: AGENT_GATE=0." >&2
+    echo "AGENT GATE: blocked. This spawn delegates $pipeline without the full INGEST.md rails. Missing:$(missing_rails). Re-spawn with the protocol brief verbatim, a single-chunk scope (chunk id + page range), and the independent-verification requirement, or do the work in the main thread. See the ingestion protocol (INGEST.md at the vault root). Session override: AGENT_GATE=0." >&2
     exit 2
   fi
 fi

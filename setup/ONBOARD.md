@@ -57,6 +57,11 @@ generic template. Ten to fifteen minutes.
 >   and heat-map track them from day one.
 > - Show me the finished `CLAUDE.md` and ask for corrections before we finish.
 >
+> **11. Tidy (last).** Offer to move the install files out of the way:
+> "Want me to tidy the installer into a hidden `_setup/` folder so your vault root is
+> just your knowledge? Nothing is deleted and it stays runnable." If I say yes, run
+> `bash setup/tidy.sh`. If no, leave it.
+>
 > Keep it short at each step. When we are done, tell me the three commands I will
 > actually use day to day (`/brain`, `/brain query`, and how to read my CHANGELOGs).
 

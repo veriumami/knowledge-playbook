@@ -55,7 +55,9 @@ say "ensured vault skeleton (repos/ inbox/ _meta/)"
 # 2b) Mandatory protocols + non-destructive CLAUDE.md reference ---------------
 cp "$HERE/no-inference.md" "$VAULT/NO-INFERENCE.md"
 cp "$HERE/PUSHBACK.md" "$VAULT/PUSHBACK.md"
-say "installed NO-INFERENCE.md + PUSHBACK.md (ground-truth + skepticism protocols)"
+cp "$HERE/INGEST.md" "$VAULT/INGEST.md"
+cp "$HERE/KIT.md" "$VAULT/KIT.md"
+say "installed NO-INFERENCE.md + PUSHBACK.md + INGEST.md + KIT.md at the vault root"
 CLAUDEMD="$VAULT/CLAUDE.md"
 if [[ ! -f "$CLAUDEMD" ]]; then
   cat > "$CLAUDEMD" <<'CM'

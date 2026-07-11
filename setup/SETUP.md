@@ -63,7 +63,12 @@ replaces filling templates by hand.
    (`session_end_hook.sh`) is present, it is superseded, not duplicated.
 4. Schedules a nightly polish at 2:15am via a launchd job with a **neutral label**
    derived from your vault name (never a hardcoded project name).
-5. Creates the vault skeleton (`repos/`, `inbox/`, `_meta/`).
+5. Creates the vault skeleton (`repos/`, `inbox/`, `_meta/`) and copies the reference
+   docs (NO-INFERENCE.md, PUSHBACK.md, INGEST.md, KIT.md) to the vault root.
+
+After onboarding, the wizard offers to run `tidy.sh`, which moves the installer into a
+hidden `_setup/` folder so your vault root shows only your knowledge. Nothing is
+deleted; upgrade later with `bash _setup/setup.sh <vault>`.
 
 ## After install
 

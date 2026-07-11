@@ -5,9 +5,11 @@ machine, holding any copy of this folder, can know exactly what it has, what the
 do, what must never be weakened, and how to verify an install. Read it before acting on
 the rest of the folder.
 
-Canonical home: https://github.com/veriumami/knowledge-playbook (directory `setup/`).
-Version: see `VERSION` in this folder. Upgrading = replace this folder with a newer
-copy and re-run `setup.sh` (idempotent; it never clobbers a personalized CLAUDE.md).
+Canonical home: https://github.com/veriumami/knowledge-playbook (the `setup/` directory).
+This kit folder is named `setup/` before onboarding and `_setup/` after the user runs
+`tidy.sh` (both are the same kit; adjust paths accordingly). Version: see `VERSION`.
+Upgrading = replace this folder with a newer copy and re-run `setup.sh` (idempotent; it
+never clobbers a personalized CLAUDE.md).
 
 ## What this kit builds
 
@@ -22,6 +24,7 @@ is personalized to its owner by interview, not template.
 | File | Role |
 |---|---|
 | `setup.sh` / `uninstall.sh` | Installer (idempotent) and its reversal. Installs skills, wires hooks, copies protocols, creates the vault skeleton. |
+| `tidy.sh` | Post-onboarding cleanup: moves this whole kit into `_setup/` so the vault root shows only the user's knowledge. Never deletes; the kit stays runnable at `_setup/`. |
 | `SETUP.md` | Human-readable install runbook (run it, or paste into Claude). |
 | `ONBOARD.md` | The onboarding interview: personalizes the vault (field, goals, folders, source policy, precision dial, tracking). Run after setup.sh. |
 | `no-inference.md` | The ground-truth protocol. Installed to vault root as `NO-INFERENCE.md`, imported by CLAUDE.md. |
@@ -62,6 +65,8 @@ is personalized to its owner by interview, not template.
 5. Work a session in any git repo under the vault: on session end, that repo gains a
    CHANGELOG.md entry mirrored into `repos/<name>/attempts.md`.
 6. `uninstall.sh` removes both hooks and the launchd job, leaving vault content intact.
+7. `tidy.sh` moves the kit to `_setup/`, leaving the root with CLAUDE.md, NO-INFERENCE.md,
+   PUSHBACK.md, INGEST.md, KIT.md, repos/, inbox/; the kit still runs from `_setup/`.
 
 ## Platform notes
 
