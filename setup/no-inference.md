@@ -67,6 +67,13 @@ ingested source also gets a short critical appraisal BEFORE it is leaned on: wha
 good for, its weaknesses, and whether it points the project down the right path. A
 source that fails the policy can still be read, but claims resting on it are flagged.
 
+## Precision is explicit, never silent
+
+Ingestion runs at a user-chosen precision level (the dial in INGEST.md): cite-grade,
+working-grade, or a labeled SKIMMED index-grade. Lower levels save tokens by narrowing
+verification scope or depth, never by weakening the rules: a SKIMMED chunk cannot
+support a claim, and anything cited is cite-grade with the full main-thread audit.
+
 ## Complex questions start with sourcing
 
 When a question needs sources the vault does not hold, the answer STARTS with what to

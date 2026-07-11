@@ -52,23 +52,28 @@ say "installed skills: $selected"
 mkdir -p "$VAULT/repos" "$VAULT/inbox" "$VAULT/_meta"
 say "ensured vault skeleton (repos/ inbox/ _meta/)"
 
-# 2b) Mandatory no-inference protocol + non-destructive CLAUDE.md reference ---
+# 2b) Mandatory protocols + non-destructive CLAUDE.md reference ---------------
 cp "$HERE/no-inference.md" "$VAULT/NO-INFERENCE.md"
-say "installed NO-INFERENCE.md (ground-truth protocol)"
+cp "$HERE/PUSHBACK.md" "$VAULT/PUSHBACK.md"
+say "installed NO-INFERENCE.md + PUSHBACK.md (ground-truth + skepticism protocols)"
 CLAUDEMD="$VAULT/CLAUDE.md"
 if [[ ! -f "$CLAUDEMD" ]]; then
   cat > "$CLAUDEMD" <<'CM'
 # Vault rules
 
 @NO-INFERENCE.md
+@PUSHBACK.md
 
-<!-- Personal + project rules go below. The no-inference protocol imported above is
-     mandatory for any cited / academic / legal work. A CLAUDE.md at the vault root is
-     loaded for every session run anywhere underneath it. -->
+<!-- Personal + project rules go below. The imports above are mandatory: the
+     no-inference protocol for any cited / academic / legal work, and the pushback
+     protocol (verdicts are hypotheses; council windmill-check before long chases).
+     A CLAUDE.md at the vault root is loaded for every session run anywhere
+     underneath it. -->
 CM
-  say "created CLAUDE.md importing NO-INFERENCE.md (applies to all subprojects)"
-elif ! grep -q "NO-INFERENCE.md" "$CLAUDEMD"; then
-  say "NOTE: add a line '@NO-INFERENCE.md' to your existing $CLAUDEMD so it loads every session"
+  say "created CLAUDE.md importing both protocols (applies to all subprojects)"
+else
+  grep -q "NO-INFERENCE.md" "$CLAUDEMD" || say "NOTE: add '@NO-INFERENCE.md' to your existing $CLAUDEMD"
+  grep -q "PUSHBACK.md" "$CLAUDEMD" || say "NOTE: add '@PUSHBACK.md' to your existing $CLAUDEMD"
 fi
 
 # 3) Wire hooks: SessionEnd auto-log + PreToolUse agent gate ------------------

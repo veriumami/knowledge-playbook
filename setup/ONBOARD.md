@@ -34,7 +34,10 @@ generic template. Ten to fifteen minutes.
 > ask me its purpose and what to look for, chunk big documents with a manifest, extract
 > one chunk per railed agent (page-by-page, every table in full, equations verbatim with
 > page numbers, NOT VERIFIED default), verify each chunk with an independent second
-> agent, and spot-check in the main thread. Tailor the worked example to MY field.
+> agent, and spot-check in the main thread. Also confirm the precision dial: you always
+> ask which level each source gets (cite-grade / working-grade / SKIMMED index), the
+> manifest records it, and anything that will be cited is cite-grade, no exceptions.
+> Tailor the worked example to MY field.
 > **8. Complex questions.** Confirm: when a question needs sources the vault lacks, you
 > start by telling me exactly what to obtain and where, I upload it, and ingestion runs;
 > you do not answer deep questions from model memory. **9. How to guide me.** Confirm:

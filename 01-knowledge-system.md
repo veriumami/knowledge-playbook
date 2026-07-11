@@ -103,6 +103,15 @@ papers, recency window for current work), tracking, and citation strictness, the
 your root `CLAUDE.md` and per-research-folder rules from your answers, with the
 extraction ritual's examples tailored to your field and the rules kept verbatim.
 
+Two more defaults ship with every install. A **precision dial** on ingestion: the user
+chooses cite-grade, working-grade, or a labeled SKIMMED index per source, the manifest
+records it, and lower levels save tokens by narrowing verification scope, never by
+weakening rules (cited work is always cite-grade). And a **pushback protocol**
+([`setup/PUSHBACK.md`](setup/PUSHBACK.md)), loaded into every session beside the
+no-inference rules: verdicts are hypotheses until checked against raw signals, user
+pushback escalates skepticism instead of defensiveness, and no multi-session chase
+starts without a council windmill-check arguing the case that the path is wrong.
+
 ## What is deliberately absent
 
 No PARA hierarchy, no daily notes, no plugins, no cloud sync, no tags

@@ -151,7 +151,10 @@ critical appraisal of every source before reliance), **sourcing-first complex
 questions** (when the vault lacks the sources, the answer starts with what to obtain
 and where, not with model memory), and **user-guided methodology** (options with
 trade-offs, the user picks). Ingestion of new sources runs on rails per
-[setup/INGEST.md](setup/INGEST.md).
+[setup/INGEST.md](setup/INGEST.md), at a user-chosen **precision level** (cite-grade /
+working-grade / labeled SKIMMED) that trades tokens for scope, never for rule strength.
+The skepticism companion, [setup/PUSHBACK.md](setup/PUSHBACK.md), loads beside these
+rules in every vault session.
 
 ## Source
 
