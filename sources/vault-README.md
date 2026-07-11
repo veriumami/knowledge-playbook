@@ -40,6 +40,12 @@ project — that's the signal it belongs here.
   philosophy + atomic note discipline.
 - [[_meta/adding-a-new-note|_meta/adding-a-new-note]] — template +
   naming convention for new notes.
+- [[playbook/README|playbook/]] — the outward-facing operating manual
+  distilled from this vault (no-inference protocols, deterministic
+  shells, adversarial method, agent guardrails, case studies). Pushed
+  private to `veriumami/knowledge-playbook`; rendered as the
+  `noahkim-portfolio.netlify.app` site. Built as a teaching artifact
+  and portfolio, not a methodology note.
 
 ---
 
