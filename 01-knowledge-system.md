@@ -72,6 +72,21 @@ copying:
    checks `## Status` and `## Last validated` and flags anything old.
    In fast-moving domains, even 30 days is suspect.
 
+## Per-session auto-logging is part of the vault
+
+The logbook is not something you remember to keep. When a working session ends, a
+`SessionEnd` hook writes that session straight into each git project's `CHANGELOG.md`
+and mirrors it into `repos/<name>/attempts.md`, newest first, deduped, with a nightly
+job that rebuilds a clean `SESSION_INDEX.md`. Entries record only verifiable material
+(git commits, files changed, timestamps) and are tagged `<!-- auto -->`, so the machine
+never invents outcomes and your own edits stay separate. New projects self-register the
+first time you work in them.
+
+This is the runnable part of the vault: [`setup/`](setup/SETUP.md) installs the skill,
+wires the hook, and schedules the nightly polish with one command
+(`bash setup/setup.sh <vault-path>`), reversible via `setup/uninstall.sh`. macOS today;
+Linux needs a cron/systemd timer for the polish.
+
 ## What is deliberately absent
 
 No PARA hierarchy, no daily notes, no plugins, no cloud sync, no tags

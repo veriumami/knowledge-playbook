@@ -104,6 +104,15 @@ entirely from the rails in this playbook. It won't write your brief for
 you. It will make sure that when the model helps, nothing it invents
 reaches the page.
 
+## Skip the setup: run the vault installer
+
+You do not have to wire any of this by hand. [`setup/`](setup/SETUP.md) is a runnable
+installer: `bash setup/setup.sh <vault-path>` (or paste the runbook into Claude and let
+it do it). It installs the `brain` skill, turns on [per-session
+auto-logging](01-knowledge-system.md), and schedules the nightly polish, all reversible
+with `setup/uninstall.sh`. That gives you a self-logging vault out of the box; the day-by-day
+patterns above are what to do *inside* it.
+
 ## Source
 
 - [sources/how-this-vault-works.md](sources/how-this-vault-works.md): the "re-explaining the same trick" entry signal, the three-part bar
