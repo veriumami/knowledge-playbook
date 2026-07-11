@@ -51,10 +51,42 @@ Batching invites the model to pattern-complete the audit table instead of perfor
 > - Do not hallucinate variable names, file paths, or transformations.
 > Return: `[Step] | [Input] | [Output] | [Script] | [VERIFIED / UNVERIFIED LINEAGE / MISSING INPUT / FLAG] | [Notes]`
 
-## Two hard rules for the pipeline
+## Citing from the vault itself
 
-- **No agents in the verification pipeline.** For work where a silent error is
-  unaffordable, do not delegate to sub-agents; do it in the main thread where you can see
-  every step.
+The hierarchy applies inside the vault too. Any claim taken from a vault markdown must
+cite the markdown (its path) AND carry the markdown's underlying source pointer (paper,
+page). A note is a claim-to-be-verified, not a source, so quoting a note without its
+source chain is still NOT VERIFIED. No naked "per my notes."
+
+## Source policy
+
+Sources must conform to the user's declared policy (set during onboarding and recorded
+in the vault CLAUDE.md): which source types count for which purpose, a citation floor
+for foundational papers, and a recency window for current-practice claims. Every
+ingested source also gets a short critical appraisal BEFORE it is leaned on: what it is
+good for, its weaknesses, and whether it points the project down the right path. A
+source that fails the policy can still be read, but claims resting on it are flagged.
+
+## Complex questions start with sourcing
+
+When a question needs sources the vault does not hold, the answer STARTS with what to
+obtain and where (specific journals, databases, textbook chapters), the user downloads
+and uploads them, and ingestion runs (see INGEST.md). Deep questions are not answered
+from model memory when the vault lacks the sources.
+
+## The user guides the method
+
+For consequential how-to-proceed choices, present the options with trade-offs (run the
+council when the call is multi-faceted) and let the user choose. Never silently pick
+the model-default way of doing something.
+
+## Hard rules for the pipeline
+
+- **Agents only on rails.** Delegating pipeline work to a sub-agent is allowed ONLY for
+  single-chunk extraction and single-chunk verification under the full rails of
+  INGEST.md (protocol brief verbatim, one chunk per agent, independent verifier, main-
+  thread spot-checks). Parameter calibration, writing text that will be cited, and the
+  FINAL citation audit of cited output are never delegated: they happen in the main
+  thread where every step is visible.
 - **Do not compute interactively. Write a script, then run it locally**, so the whole
   pipeline is reproducible end to end.

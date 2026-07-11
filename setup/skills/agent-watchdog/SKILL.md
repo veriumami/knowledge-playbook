@@ -37,14 +37,14 @@ Two rules, applied to every agent before its work is trusted. Both come straight
 
 ### 0. The deterministic layer: the spawn gate (no model discretion)
 
-Where the vault was installed with `setup.sh`, enforcement does not rely on this skill being invoked at all: a **PreToolUse hook** (`scripts/agent_gate.sh`, matcher `Task|Agent`) runs on every sub-agent spawn. Banned pipeline work in the spawn prompt (source extraction, calibration, citation/data audits, cited-text writing) is **refused** with the reason fed back; research-flavored spawns missing a no-inference brief get a **warning** and proceed. Session escape hatch: `AGENT_GATE=0`. The sections below are the judgment layer on top of that hard floor.
+Where the vault was installed with `setup.sh`, enforcement does not rely on this skill being invoked at all: a **PreToolUse hook** (`scripts/agent_gate.sh`, matcher `Task|Agent`) runs on every sub-agent spawn. Work that is never delegated (parameter calibration, cited-text writing, the FINAL citation/data-lineage audit) is **refused** outright. Extraction and chunk-verification spawns are **allowed only on the full INGEST.md rails** — a no-inference brief, single-chunk scope, and an independent-verification requirement — and refused otherwise with the missing rails named. Research-flavored spawns missing a no-inference brief get a **warning** and proceed. Session escape hatch: `AGENT_GATE=0`. The sections below are the judgment layer on top of that hard floor.
 
 ### 1. Enforce the agent ban in the verification pipeline
 
-The protocol is explicit: for work where a silent error is unaffordable, **do not use agents at all**, do it in the main thread where every step is visible. So before accepting any agent, classify what it was spawned to do:
+The protocol allows delegation only on rails. Before accepting any agent, classify what it was spawned to do:
 
-- **Allowed**: read-only research, landscape/library surveys, code search, evidence-mining that returns cited findings for later verification.
-- **Banned**: extracting a source into a markdown, calibrating a parameter, running a citation or data-lineage audit, or writing anything that will itself be cited. If an agent is doing this, that is the finding: stop it, and move the work to the main thread. Do not "rescue" its output into a source-of-truth file.
+- **Allowed**: read-only research, landscape/library surveys, code search, evidence-mining that returns cited findings for later verification; and RAILED ingestion per INGEST.md — single-chunk extraction or single-chunk verification carrying the protocol brief, one-chunk scope, and the independent-verification requirement (extractor and verifier are never the same agent; the main thread spot-checks a sample).
+- **Banned**: unrailed extraction or verification (missing any of the three rails), parameter calibration, writing anything that will itself be cited, and the FINAL citation/data-lineage audit of cited output. If an agent is doing this, that is the finding: stop it, and move the work to the main thread (or re-spawn it properly railed). Do not "rescue" its output into a source-of-truth file.
 
 A banned-work agent is a 🚫 `off-protocol` condition, and it outranks a stall. Report it even if the agent is happily "active."
 

@@ -87,14 +87,21 @@ wires the hooks, and schedules the nightly polish with one command
 (`bash setup/setup.sh <vault-path>`), reversible via `setup/uninstall.sh`. macOS today;
 Linux needs a cron/systemd timer for the polish.
 
-Two more properties are wired in, not hoped for. An **agent gate** (a PreToolUse hook)
-runs on every sub-agent spawn: work the no-inference protocol bans delegating (source
-extraction, calibration, citation audits) is refused with the reason, and research
-spawns missing a no-inference brief get a warning. And the vault is **personalized by
-interview, not template**: [`setup/ONBOARD.md`](setup/ONBOARD.md) has Claude ask about
-your field, goals, subfolders, tracking, and citation strictness, then write your root
-`CLAUDE.md` and per-research-folder rules from your answers, with the extraction ritual's
-examples tailored to your field and the rules kept verbatim.
+Three more properties are wired in, not hoped for. An **agent gate** (a PreToolUse hook)
+runs on every sub-agent spawn: work the protocol never delegates (calibration,
+cited-text writing, the final citation audit) is refused outright, and extraction or
+verification spawns pass only on the full ingestion rails (protocol brief, single-chunk
+scope, independent verification). A **source-ingestion pipeline**
+([`setup/INGEST.md`](setup/INGEST.md)): drop a textbook or paper into a research folder
+and it is purpose-queried, appraised against your source policy, chunked with a
+manifest, extracted one chunk per railed agent, verified by an independent second
+agent, and spot-checked in the main thread, so the knowledge survives with nothing
+fabricated and nothing lost. And the vault is **personalized by interview, not
+template**: [`setup/ONBOARD.md`](setup/ONBOARD.md) has Claude ask about your field,
+goals, subfolders, source policy (types per purpose, citation floor for foundational
+papers, recency window for current work), tracking, and citation strictness, then write
+your root `CLAUDE.md` and per-research-folder rules from your answers, with the
+extraction ritual's examples tailored to your field and the rules kept verbatim.
 
 ## What is deliberately absent
 

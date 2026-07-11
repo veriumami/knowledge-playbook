@@ -10,10 +10,14 @@ It also installs the kit, in tiers: **core** (brain, plus **agent-watchdog** whi
 gates every sub-agent spawn), **default** (council-simulation for adversarial second
 opinions), and **optional** (debugging-council, added with `BRAIN_SETUP_SKILLS=all`).
 The mandatory **no-inference protocol** (`NO-INFERENCE.md`) is auto-loaded via a root
-`CLAUDE.md`, and a **PreToolUse agent gate** enforces it deterministically: a spawn that
-asks an agent to do banned pipeline work (source extraction, calibration, citation
-audits) is refused with the reason, and research spawns missing a no-inference brief get
-a warning. Disable per-session with `AGENT_GATE=0`.
+`CLAUDE.md`, and a **PreToolUse agent gate** enforces it deterministically: calibration,
+cited-text writing, and the final citation audit are never delegated; extraction and
+verification spawns pass only on the full `INGEST.md` rails (protocol brief,
+single-chunk scope, independent verification); research spawns missing a no-inference
+brief get a warning. Disable per-session with `AGENT_GATE=0`. Dropping a source
+document into a research folder triggers the **ingestion pipeline** (`INGEST.md`):
+purpose query, policy appraisal, chunk manifest, railed per-chunk extraction, and
+independent verification, so nothing is fabricated and nothing is lost.
 
 It is honest by construction: entries record only what is verifiable (git commits, file
 counts, timestamps). It never invents outcomes, and machine entries are tagged

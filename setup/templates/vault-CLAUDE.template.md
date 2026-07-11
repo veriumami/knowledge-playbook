@@ -16,17 +16,42 @@
 {{SUBFOLDERS: the project subfolders this knowledge base is built around, one line each,
 with what lives in them and any key files worth knowing about.}}
 
+## Source policy
+{{SOURCE_POLICY: which source types count for which purpose (research / coursework /
+business), and where they come from (databases, journals, sideloaded PDFs).}}
+
+{{FOUNDATIONAL_VS_CURRENT: e.g. "Foundational claims rest on papers with 100+ citations;
+current-practice claims on sources from the last 5 years. Sources outside the policy are
+flagged, and claims resting on them stay flagged."}}
+
+Every ingested source gets a critical appraisal (what it is good for, weaknesses,
+whether it points the project down the right path) before it is leaned on.
+
 ## Citation strictness
 {{SCOPE: either "The full no-inference protocol applies everywhere." or "The full
 protocol applies in these research folders: <list>. Elsewhere, cite when asserting facts
 but the extraction ritual is not required."}}
 
+Pulling information from a vault markdown always cites the note (path) AND its
+underlying source (paper, page). A note without its source chain is NOT VERIFIED. This
+rule is not configurable.
+
 ## When a new source file arrives
-{{NEW_FILE_RULE: e.g. "When a new PDF or source document lands in a research folder,
-create an extraction markdown for it under the strict protocol before citing it in any
-draft: read page by page first, transcribe every table in full, equations verbatim with
-page numbers, bibliographic details first, uncertainty defaults to NOT VERIFIED."
-Tailor the examples to the field; never weaken the rules.}}
+{{NEW_FILE_RULE: default = the INGEST.md pipeline: purpose query first, appraisal, chunk
+manifest, one railed agent per chunk (page-by-page, every table in full, equations
+verbatim with page numbers, NOT VERIFIED default), independent second-agent
+verification, main-thread spot-check. Tailor the examples to the field; never weaken
+the rules.}}
+
+## Complex questions
+{{COMPLEX_QUESTION_RULE: default = "When a question needs sources the vault lacks, start
+by naming exactly what to obtain and where; I upload; ingestion runs. Do not answer deep
+questions from model memory."}}
+
+## Methodology choices
+{{METHODOLOGY_RULE: default = "For consequential how-to-proceed choices, present options
+with trade-offs (council-simulation when multi-faceted) and let me choose. Never
+silently pick the automatic answer."}}
 
 ## How I like to work
 {{WORKSTYLE: feedback loops vs deep dives, when to bring in the council, tracking

@@ -140,6 +140,19 @@ confidentiality.** Do not put privileged or client-identifying material
 into any AI tool without your firm's explicit authorization. Build the
 protocol on public sources first.
 
+## Newer rails (installed with the vault)
+
+The installable protocol ([setup/no-inference.md](setup/no-inference.md)) extends the
+original with four rails the vault enforces day to day: **vault citations** (a claim
+pulled from a vault note cites the note AND its underlying source, because a note is a
+claim-to-be-verified, not a source), a **source policy** (types per purpose, a citation
+floor for foundational papers, a recency window for current-practice claims, and a
+critical appraisal of every source before reliance), **sourcing-first complex
+questions** (when the vault lacks the sources, the answer starts with what to obtain
+and where, not with model memory), and **user-guided methodology** (options with
+trade-offs, the user picks). Ingestion of new sources runs on rails per
+[setup/INGEST.md](setup/INGEST.md).
+
 ## Source
 
 - [sources/research-project-CLAUDE.md](sources/research-project-CLAUDE.md): the verbatim rules and both audit prompt templates (original: `Knowledge/Research Project/CLAUDE.md`)

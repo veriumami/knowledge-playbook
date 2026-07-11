@@ -18,15 +18,29 @@ generic template. Ten to fifteen minutes.
 > **1. Me.** My field, background, and what I know cold (the expertise the vault should
 > lean on). **2. Goals.** What this vault should make possible in 3 months, concretely.
 > **3. Structure.** Which subfolders or projects the knowledge base is built around;
-> important existing files worth registering. **4. Tracking.** How much detail I want in
-> the per-session changelogs, and what the nightly index should surface. **5. Citation
+> important existing files worth registering. **4. Source policy.** For each purpose
+> (research, coursework, business decisions): which source types count (peer-reviewed
+> only? textbooks? industry docs? legal journals?), where I get them (databases I can
+> access, journals I download or sideload), my citation floor for foundational papers
+> (for example 100+ citations), and my recency window for current-practice claims (for
+> example the last 5 years). Also confirm: every ingested source gets a short critical
+> appraisal (what it is good for, weaknesses, whether it points the project down the
+> right path) BEFORE we lean on it. **5. Tracking.** How much detail I want in the
+> per-session changelogs, and what the nightly index should surface. **6. Citation
 > strictness.** Whether the full extraction protocol applies everywhere, or strictly only
-> in research folders I name (and relaxed elsewhere). **6. New-file rule.** Confirm: when
-> a new source (PDF, paper, report) lands in a research folder, sessions must create an
-> extraction markdown under the strict protocol before it can be cited: read page by
-> page first, every table in full, equations verbatim with page numbers, bibliographic
-> details first, uncertainty defaults to NOT VERIFIED. Tailor the worked example to MY
-> field. **7. Optional skill.** Do I code enough to want debugging-council (a
+> in research folders I name (and relaxed elsewhere). Either way, pulling information
+> from vault markdowns always cites the note AND its underlying source. **7. New-file
+> rule.** Confirm the INGEST.md pipeline: when a new source lands in a research folder,
+> ask me its purpose and what to look for, chunk big documents with a manifest, extract
+> one chunk per railed agent (page-by-page, every table in full, equations verbatim with
+> page numbers, NOT VERIFIED default), verify each chunk with an independent second
+> agent, and spot-check in the main thread. Tailor the worked example to MY field.
+> **8. Complex questions.** Confirm: when a question needs sources the vault lacks, you
+> start by telling me exactly what to obtain and where, I upload it, and ingestion runs;
+> you do not answer deep questions from model memory. **9. How to guide me.** Confirm:
+> for consequential methodology choices you present options with trade-offs (the council
+> when it is multi-faceted) and I pick; you never silently default to the automatic
+> answer. **10. Optional skill.** Do I code enough to want debugging-council (a
 > five-specialist debugging roundtable)? If yes, run
 > `BRAIN_SETUP_SKILLS=all bash setup/setup.sh "$(pwd)"` to add it.
 >
