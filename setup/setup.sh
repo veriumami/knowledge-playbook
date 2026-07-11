@@ -18,31 +18,48 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BUNDLE="$HERE/skills/brain"
 SKILLS_DIR="$HOME/.claude/skills"
-DEST="$SKILLS_DIR/brain"
 VAULT="${1:-${BRAIN_VAULT:-$HOME/Documents/Knowledge}}"
 SETTINGS="$HOME/.claude/settings.json"
 HOOK_CMD="BRAIN_VAULT=\"$VAULT\" \$HOME/.claude/skills/brain/hooks/session_autolog.sh"
 
 say() { printf '  %s\n' "$*"; }
-echo "▶ Knowledge-vault auto-log setup"
+echo "▶ Knowledge-vault setup (auto-log + core skills + no-inference protocol)"
 say "vault:  $VAULT"
-say "skills: $DEST"
+say "skills: $SKILLS_DIR"
 
-# 1) Install / update the skill bundle (preserve any existing state files) ----
+# 1) Install / update all bundled skills (preserve any existing state files) --
 mkdir -p "$SKILLS_DIR"
-if command -v rsync >/dev/null 2>&1; then
-  rsync -a "$BUNDLE/" "$DEST/"
-else
-  mkdir -p "$DEST" && cp -R "$BUNDLE/." "$DEST/"
-fi
-chmod +x "$DEST"/hooks/*.sh "$DEST"/scripts/*.sh 2>/dev/null || true
-say "installed brain skill (hooks + scripts)"
+for src in "$HERE"/skills/*/; do
+  name=$(basename "$src")
+  dst="$SKILLS_DIR/$name"
+  if command -v rsync >/dev/null 2>&1; then rsync -a "$src" "$dst/"; else mkdir -p "$dst" && cp -R "$src." "$dst/"; fi
+  chmod +x "$dst"/hooks/*.sh "$dst"/scripts/*.sh 2>/dev/null || true
+done
+say "installed skills: $(cd "$HERE/skills" && ls -d */ | tr -d '/' | tr '\n' ' ')"
 
 # 2) Vault skeleton ----------------------------------------------------------
 mkdir -p "$VAULT/repos" "$VAULT/inbox" "$VAULT/_meta"
 say "ensured vault skeleton (repos/ inbox/ _meta/)"
+
+# 2b) Mandatory no-inference protocol + non-destructive CLAUDE.md reference ---
+cp "$HERE/no-inference.md" "$VAULT/NO-INFERENCE.md"
+say "installed NO-INFERENCE.md (ground-truth protocol)"
+CLAUDEMD="$VAULT/CLAUDE.md"
+if [[ ! -f "$CLAUDEMD" ]]; then
+  cat > "$CLAUDEMD" <<'CM'
+# Vault rules
+
+@NO-INFERENCE.md
+
+<!-- Personal + project rules go below. The no-inference protocol imported above is
+     mandatory for any cited / academic / legal work. A CLAUDE.md at the vault root is
+     loaded for every session run anywhere underneath it. -->
+CM
+  say "created CLAUDE.md importing NO-INFERENCE.md (applies to all subprojects)"
+elif ! grep -q "NO-INFERENCE.md" "$CLAUDEMD"; then
+  say "NOTE: add a line '@NO-INFERENCE.md' to your existing $CLAUDEMD so it loads every session"
+fi
 
 # 3) Wire the SessionEnd hook (supersede the old pending-draft hook) ----------
 mkdir -p "$HOME/.claude"
@@ -108,5 +125,7 @@ else
   say "non-macOS: add a cron/systemd timer for scripts/polish_changelog.sh (follow-up)"
 fi
 
-echo "✓ Done. New sessions in any git repo now auto-log to that repo's CHANGELOG.md,"
-echo "  mirrored into $VAULT/repos/<name>/. Reverse with: bash $HERE/uninstall.sh $VAULT"
+echo "✓ Done. Installed brain + agent-watchdog + council-simulation + debugging-council,"
+echo "  the no-inference protocol, and per-session auto-logging (each git repo's"
+echo "  CHANGELOG.md, mirrored into $VAULT/repos/<name>/)."
+echo "  Reverse the wiring with: bash $HERE/uninstall.sh $VAULT"

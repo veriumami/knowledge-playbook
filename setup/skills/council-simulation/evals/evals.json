@@ -1,0 +1,26 @@
+{
+  "skill_name": "council-simulation",
+  "evals": [
+    {
+      "id": 0,
+      "name": "personal-dilemma-career-switch",
+      "prompt": "I'm 34, been a mechanical engineer at a mid-size manufacturing company for 9 years making $115k. I have a chance to switch to software engineering via a bootcamp — would cost me $17k and ~7 months with no income (I have savings). My wife is supportive but nervous because we just had our first kid 4 months ago. The mechanical job is stable but I'm bored and the field feels stagnant. Software pays better long-term and I've been doing hobby coding for 3 years. Help me think through whether to do this now, wait 2-3 years until the kid is older, or just stay put. I keep flip-flopping and my gut says do it but my wife's practical concerns are valid.",
+      "expected_output": "Full council simulation with a personal-dilemma panel (philosopher, entrepreneur, therapist/introspective voice, historical leader, wild card) running all 10 phases: capture decision (stated vs underlying), bias check, roundtable in-character, structured debate between most-disagreeing pair, decision matrix across options (do now / wait 2-3yr / stay), synthesis with named dissent, implementation plan, confidence calibration, metacognitive prompts. Should NOT fake consensus — named dissent expected. Personal contexts should weight Phase 10 more heavily.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "technical-architecture-debate",
+      "prompt": "We're a Series B SaaS with a 6-engineer team. Our Rails monolith is 8 years old, 180k LOC, ~400 req/s peak. We're deciding between three paths: (1) full rewrite in Nextjs + Node backend (estimate 8 months, high risk of feature freeze), (2) gradual strangler-fig extraction into a few Node services while keeping Rails core (12-18 months, lower risk, split-brain complexity), or (3) stay on Rails and just add Hotwire/Turbo for the modern feel (2-3 months, low risk, Rails skill-pool problem). I'm the CTO and the team is split. Budget approx $400k for whichever path. Need a council to debate this properly.",
+      "expected_output": "Full council simulation with technical panel (Carmack, Willison, Hickey, Luu, Beck or similar). Emphasizes Phases 4-7. Decision matrix with concrete engineering criteria (cost, risk, feature velocity during transition, team skill match, tech debt reduction). Phase 8 implementation should be specific (files, PRs, timelines). Named dissent required. Confidence calibration should reflect that strategic tech decisions have low reversibility once ~3 months in.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "strategic-expansion-question",
+      "prompt": "I run a kids-sneaker deal aggregator (tinytreads.org) with ~4700 product matches across 8 brands at 10 retailers. Recent research showed: Lyst abandoned the kids vertical (architecturally absent); we're the only site doing price-history for kids sneakers; family-matching feature has near-zero evidence of demand. I'm considering three paths for the next 6 months: (a) expand to adult shoes for more TAM, (b) double down on kids with deeper matcher + visual similarity + better UX, (c) pivot to adjacent category (kids apparel? teens? young adults?). I want a strategic council to debate this — evidence leans toward (b) but I'm drawn to (a) because I want 'best everything, best UI, best backend' and that seems bigger than kids-only. Help me reconcile.",
+      "expected_output": "Full council simulation with strategic panel (PG, Thiel or Hotz, Cagan, Doshi, Hickey). Phase 1 should surface the underlying question (the tension between 'ambition to be big' vs 'evidence says narrow niche wins'). Strong Phase 7 synthesis with named forbidden directions. Decision matrix weighted on defensibility + evidence + vertical-scaling. Metacognitive prompts should include 'who are you best FOR?' framing.",
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+[
+  {"query": "why does my test_user_service.py::test_login_flow pass locally but fail 20% of the time in CI? I've tried adding timeouts and marking it flaky but that feels wrong", "should_trigger": true},
+
+  {"query": "my scraper sometimes saves 50 rows and sometimes 200 from the same URL. no errors, no exceptions. I'm going crazy trying to figure out where the data is going", "should_trigger": true},
+
+  {"query": "adding print statements makes my segfault go away. removing them brings it back. valgrind also masks it. this is definitely a heisenbug but where do I even start", "should_trigger": true},
+
+  {"query": "CI keeps failing on this one test and I've already rerun it 4 times. the failure is always the same TimeoutError but I can't reproduce it locally no matter what I try", "should_trigger": true},
+
+  {"query": "help me debug — my background worker randomly dies at 3am every few nights. no logs, no crash report, just gone. I've checked memory, disk, network. What could it be?", "should_trigger": true},
+
+  {"query": "this used to work in v1.2.4 and now it's broken in v1.3.0. I've bisected to commit abc123 but can't figure out why it changed the behavior since the diff looks unrelated", "should_trigger": true},
+
+  {"query": "I'm seeing silent data corruption in our message queue — messages sometimes arrive with fields truncated. can't reproduce in test. help me root-cause this properly before I just add validation and move on", "should_trigger": true},
+
+  {"query": "help me debug this race condition in my goroutine fan-out pool. I think workers are double-processing but I can't prove it — sometimes the output is wrong, sometimes right. Need to actually understand it", "should_trigger": true},
+
+  {"query": "works on my machine but not on my coworker's. same macOS version, same node version. we've compared everything we can think of. what am I missing", "should_trigger": true},
+
+  {"query": "our deploy fails intermittently with `connection refused` during the health-check step. sometimes it's the 2nd retry, sometimes 5th. I want to actually understand the failure mode, not just bump the retry count", "should_trigger": true},
+
+  {"query": "fix the TypeError on line 47 — self.user_id is None. I already know why, just need the null check added", "should_trigger": false},
+
+  {"query": "write me a Python function that reverses a linked list iteratively", "should_trigger": false},
+
+  {"query": "what's the current price of Ethereum in USD", "should_trigger": false},
+
+  {"query": "explain how TCP congestion control works — I need to understand slow-start and congestion avoidance for a presentation", "should_trigger": false},
+
+  {"query": "draft a short Slack message to my team letting them know I'll be OOO Friday afternoon", "should_trigger": false},
+
+  {"query": "generate 5 commit messages for this diff — short, imperative, follow conventional commits format", "should_trigger": false},
+
+  {"query": "add vitest ^1.0.0 as a devDependency to my package.json and update the test script", "should_trigger": false},
+
+  {"query": "help me choose between React Query and SWR for my Next.js app. pros and cons of each", "should_trigger": false},
+
+  {"query": "what design patterns exist for rate-limiting an API? give me a list with brief descriptions", "should_trigger": false},
+
+  {"query": "walk me through the implementation choice in the last commit — I want to understand why it was written that way", "should_trigger": false}
+]

@@ -1,0 +1,26 @@
+{
+  "skill_name": "debugging-council",
+  "evals": [
+    {
+      "id": 0,
+      "name": "intermittent-test-failure-in-ci",
+      "prompt": "I have a pytest test `test_foo.py::test_bar` that passes locally every time but fails in CI about 30% of the time. The error is always the same `AssertionError: expected 5 rows, got 3`. I've tried adding retries and increasing timeouts. The DB is Postgres 15 in both places. CI is GitHub Actions on ubuntu-22.04. Help me debug this properly — I keep wanting to just mark it as flaky and move on.",
+      "expected_output": "Full 5-phase debugging council. Phase 1 should push on repro specificity (ubuntu-22.04 vs local OS, Postgres shared across CI jobs or per-job, pytest-xdist parallelism, fixture teardown order, DB isolation level). Phase 2 generates hypotheses like: (H1) parallel test contention on shared DB, (H2) fixture race with autocommit, (H3) timezone/clock differences between CI and local, (H4) fixture data leaking from prior test run, (H5) pytest-xdist worker-id-dependent data. Phase 3 runs concrete falsification attacks (e.g., Luu: 'what does `--randomize --forked` do to the failure rate?'; Beck: 'what if we run only this test's fixture setup then exit — does the 3 vs 5 still appear?'). Phase 4 names BOTH proximate cause and root cause. Phase 5 produces a regression guard that forces the failing condition (seeded RNG, forked worker isolation, or serialized DB access) — NOT just 'add retries.' Named dissent if advisors disagree.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "silent-data-loss-scraper",
+      "prompt": "One of my Python scrapers is saving inconsistent row counts to Postgres. Same target URL: sometimes it saves 200 products, sometimes 50. No errors in logs. No exceptions raised. The scraper uses `psycopg` with a `with db.connect() as conn:` pattern and a `for product in products:` loop that calls `insert_product(conn, ...)`. Inside the loop there's a `try/except: conn.rollback()` block. Help me figure out what's going on — I don't trust the data anymore.",
+      "expected_output": "Full 5-phase debugging council. Phase 1 should insist on a repro that forces the failure (e.g., run with 100 products where product 50 is guaranteed to throw). Phase 2 hypotheses should include: (H1) `conn.rollback()` inside the transaction wipes products 1..N-1 when product N throws (the Block D psycopg3 semantics), (H2) network flake during scrape returns partial product list, (H3) dedup key collision silently drops products, (H4) out-of-memory kills loop early, (H5) connection pool exhaustion causes silent early-termination. Phase 3's adversarial attacks should single out H1 as the most falsifiable — Luu can propose: 'log `conn.info.transaction_status` before and after each rollback; if it shows IDLE after rollback but IN_TRANSACTION before, H1 is proven.' Phase 4 identifies root cause as psycopg3 autocommit=False + mid-loop rollback interaction, NOT just 'rollback is wrong.' Phase 5's regression guard must be a test that creates 3 products where product 2 throws and asserts products 1 AND 3 are both persisted.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "heisenbug-print-statements-mask-crash",
+      "prompt": "I have a weird one. My Rust program crashes with a segfault under normal execution, but when I add `println!` statements to help debug, the crash goes away. If I remove them, it comes back. I've tried adding `eprintln!` instead (same behavior — crash gone). Running under `valgrind` the crash also doesn't happen. Running with `RUST_LOG=debug` — crash gone. I'm completely stuck. The only time it crashes is the bare release build.",
+      "expected_output": "Full 5-phase debugging council. Phase 1 should immediately classify this as a heisenbug and probe for: release-vs-debug differences, compiler optimizations enabled, unsafe blocks, raw pointer use, lifetime issues, uninitialized memory reads. Phase 2 hypotheses: (H1) use-after-free exposed by release-mode aggressive optimization, (H2) uninitialized memory whose value changes based on print-buffer placement in BSS, (H3) race condition whose timing shifts with I/O syscalls, (H4) stack corruption masked by larger stack frames that println adds, (H5) compiler reorders across unsafe boundary. Phase 3's adversarial attacks: Carmack proposes 'compile release with -Copt-level=1 — does the crash come back? If so, rules out H3'; Luu proposes 'run under AddressSanitizer in release mode — should catch H1 and H2 but not H3'. Phase 4 root cause (likely H1 or H2, not just 'printing changes timing'). Phase 5 regression guard: enable ASan in CI for release builds, add the specific test case that triggers the path, and if the root cause was unsafe, audit adjacent unsafe blocks — not just patch the one found.",
+      "files": []
+    }
+  ]
+}

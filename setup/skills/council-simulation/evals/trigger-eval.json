@@ -1,0 +1,41 @@
+[
+  {"query": "ok so I got a job offer at Meta paying $380k base + $150k RSU and also at this 18-person YC-backed startup doing AI agents at $215k plus 0.85% equity, 4-year vest. I have 8 years at my current company, wife is pregnant with our second, and I'm completely stuck on which to take. Help me think through this", "should_trigger": true},
+
+  {"query": "my partner and I have been together 6 years, things are fine but we've been fighting more about where to live (she wants Austin, I want to stay in Brooklyn near family). Neither of us is willing to move — every conversation ends in the same stalemate. Can you help me think through whether to just break up or try couples therapy, idk what to do anymore", "should_trigger": true},
+
+  {"query": "should I migrate our Python scraper fleet from stdlib `requests` to `curl_cffi` now, or wait until we have measurement showing the current block rate is actually a problem? Full migration is maybe a week of work across 10 scrapers but I'm not sure the ROI is there without evidence of actual blocks", "should_trigger": true},
+
+  {"query": "what would rick rubin and marc andreessen say about whether I should hire a designer before launching my beta or just ship the default tailwind template and iterate based on user feedback", "should_trigger": true},
+
+  {"query": "please help me debate whether to accept this acquisition offer — $14M all-cash for my SaaS which is doing $2.8M ARR, 40% gross margin, growing 60% YoY. I'm the sole founder and honestly tired. But also feels early. No idea how to think about this", "should_trigger": true},
+
+  {"query": "ok council of elders time — my wife got into a PhD program in Edinburgh fully funded for 4 years. I work remote at a US company that would let me keep the job. We have two kids ages 3 and 6. Should we move the whole family or should I and the kids stay in the US and do long-distance for 4 years? both terrify me", "should_trigger": true},
+
+  {"query": "I keep going back and forth on whether to write my next novel in first person or third person, each has tradeoffs and I can't commit, can we talk through it from multiple angles", "should_trigger": true},
+
+  {"query": "can I get a roundtable on whether to raise a Series A now at $22M valuation with 60% dilution vs wait 9 months for better metrics and probably 30M+ valuation with less dilution but risk of market cooling", "should_trigger": true},
+
+  {"query": "trying to decide between two apartments and I'm completely paralyzed — one is $2800 and walk to work but tiny, the other is $2400 and needs a 35min subway but way more space and a dishwasher. Need multiple perspectives", "should_trigger": true},
+
+  {"query": "help me weigh the tradeoffs between staying in academia (tenure track at a decent R1 school) vs jumping to applied AI research at Anthropic/OpenAI. Pay is 4x higher in industry but I lose teaching and long-term research autonomy", "should_trigger": true},
+
+  {"query": "fix the TypeError on line 47 of user_service.py where self.user_id is returning None", "should_trigger": false},
+
+  {"query": "what's the current price of bitcoin in USD", "should_trigger": false},
+
+  {"query": "write me a python function that takes a list of dicts and sorts them by the 'created_at' field in descending order, handling None values gracefully", "should_trigger": false},
+
+  {"query": "can you explain how TLS 1.3 handshakes differ from TLS 1.2 — I'm doing a presentation for my team tomorrow", "should_trigger": false},
+
+  {"query": "draft a short professional email to my landlord asking to extend my lease by 3 months, current lease ends June 30", "should_trigger": false},
+
+  {"query": "generate 5 blog post titles for a SaaS product about time-tracking for freelancers, need them to be SEO-friendly and not cheesy", "should_trigger": false},
+
+  {"query": "add a new dev dependency to my package.json for vitest version ^1.0.0, and also update the test script to use it", "should_trigger": false},
+
+  {"query": "help me decide between pytest and unittest for my new Python project", "should_trigger": false},
+
+  {"query": "walk me through why you made that implementation choice in the last commit — I want to understand the reasoning", "should_trigger": false},
+
+  {"query": "what are the common design patterns for API rate limiting, give me a list with pros and cons of each", "should_trigger": false}
+]

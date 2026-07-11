@@ -6,6 +6,11 @@ and when the session ends each git project gets a dated entry in its own `CHANGE
 (commits, files changed, a one-line note), newest first, mirrored into the vault so
 `/brain` can search it. A nightly job rebuilds a clean session index.
 
+It also installs the core skills (**brain**, **agent-watchdog** for stalled/off-track
+sub-agents, **council-simulation** and **debugging-council** for adversarial second
+opinions) and the mandatory **no-inference protocol** (`NO-INFERENCE.md`, auto-loaded via
+a root `CLAUDE.md`) so cited / academic / legal work cannot fabricate.
+
 It is honest by construction: entries record only what is verifiable (git commits, file
 counts, timestamps). It never invents outcomes, and machine entries are tagged
 `<!-- auto -->` so your own edits stay separate.
@@ -41,13 +46,17 @@ Open Claude Code in this folder and paste:
 
 ## What the installer does (all reversible)
 
-1. Installs the `brain` skill into `~/.claude/skills/brain/`.
-2. Wires a `SessionEnd` hook in `~/.claude/settings.json` pointing at
+1. Installs the skills into `~/.claude/skills/`: **brain**, **agent-watchdog**,
+   **council-simulation**, **debugging-council**.
+2. Drops **`NO-INFERENCE.md`** at the vault root and imports it from a root `CLAUDE.md`
+   (created only if you do not already have one; otherwise it tells you the one line to
+   add). A vault-root `CLAUDE.md` loads for every session run underneath it.
+3. Wires a `SessionEnd` hook in `~/.claude/settings.json` pointing at
    `session_autolog.sh`, with your vault path baked in. If an older pending-draft hook
    (`session_end_hook.sh`) is present, it is superseded, not duplicated.
-3. Schedules a nightly polish at 2:15am via a launchd job with a **neutral label**
+4. Schedules a nightly polish at 2:15am via a launchd job with a **neutral label**
    derived from your vault name (never a hardcoded project name).
-4. Creates the vault skeleton (`repos/`, `inbox/`, `_meta/`).
+5. Creates the vault skeleton (`repos/`, `inbox/`, `_meta/`).
 
 ## After install
 
