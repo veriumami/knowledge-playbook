@@ -43,7 +43,7 @@ single answer the model gave.
 | [02-no-inference-protocol](02-no-inference-protocol.md) | **The anti-hallucination rules**: creating source markdowns, verifying citations | work in law or academia. **Start here.** |
 | [03-deterministic-shells](03-deterministic-shells.md) | Hard code around the LLM: deterministic results from a non-deterministic tool | ship numbers or facts downstream |
 | [04-adversarial-claude](04-adversarial-claude.md) | Councils, cynical review, critique-driven iteration | take AI answers on faith and want to stop |
-| [05-agents-with-guardrails](05-agents-with-guardrails.md) | Parallel agents with briefs, watchdogs, and skepticism | want research in parallel without parallel hallucination |
+| [05-agents-with-guardrails](05-agents-with-guardrails.md) | Parallel agents with briefs, watchdogs, skepticism, and create, verify, fix sequences for research work | want research in parallel without parallel hallucination |
 | [06-case-study-academic](06-case-study-academic.md) | The paper (5 eras, 12 rails) and the exam systems | want the full academic arc |
 | [07-case-study-practical](07-case-study-practical.md) | Two live businesses and a language pipeline | want the practical arc |
 | [08-variations](08-variations.md) | Cowork design to code, browser automation in tandem with models | want to see the breadth |

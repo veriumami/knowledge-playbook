@@ -4,22 +4,26 @@
 # Wired by setup.sh as a PreToolUse hook (matcher: Task|Agent) so it runs on EVERY
 # sub-agent spawn, no model discretion involved. Reads the tool-call JSON on stdin.
 #
-# Policy (v2: railed ingestion allowed, unrailed and main-thread-only work blocked):
-#   ALLOW: extraction or chunk-verification spawns that carry ALL THREE rails of
-#     INGEST.md: (a) a no-inference brief, (b) single-chunk scope (chunk id / section /
-#     one paper / page range), (c) a verification mention. This is the railed
-#     ingestion pipeline: one chunk per agent, independent verifier, main spot-check.
+# Policy (v3: every pipeline step may be delegated, on rails. Nothing is banned by category):
+#   ALLOW: pipeline spawns (source extraction, segment verification, segment fixes,
+#     parameter calibration, drafting text that will be cited, citation or data-lineage
+#     audits) that carry ALL THREE rails: (a) a no-inference brief, (b) single-segment
+#     scope (chunk id / section / lesson / one paper / page range), (c) a verification
+#     mention. This is the create -> verify -> fix sequence of INGEST.md: one segment
+#     per agent, a verifier that is never the creator, a fixer that works from the
+#     verifier's findings, and a main-thread spot-check before sign-off.
 #   BLOCK (exit 2, spawn refused, reason fed back to Claude):
-#     - extraction/verification WITHOUT the full rails (message names the missing rails
-#       and points to INGEST.md), and
-#     - work that is never delegated regardless of rails: parameter calibration,
-#       writing text that will itself be cited, and the FINAL citation/data-lineage
-#       audit of cited output.
+#     pipeline work WITHOUT the full rails (message names the missing rails and points
+#     to INGEST.md).
 #   WARN (stderr advisory, spawn proceeds):
 #     research-flavored prompt with no no-inference briefing.
 #   PASS silently: everything else (plain code/ops/search tasks).
 #
-# Escape hatch for a session: AGENT_GATE=0 (mirrors BRAIN_HOOK_ENABLED).
+# Session switches:
+#   AGENT_GATE=0         disables the gate (mirrors BRAIN_HOOK_ENABLED).
+#   AGENT_GATE_STRICT=1  restores the v2 policy: calibration, cited-text writing and the
+#                        final citation audit are refused outright, rails or not. Use it
+#                        on models older than the ones the v3 policy was validated on.
 set -euo pipefail
 
 [[ "${AGENT_GATE:-1}" != "1" ]] && exit 0
@@ -42,45 +46,48 @@ p=$(printf '%s' "$prompt" | tr '[:upper:]' '[:lower:]')
 
 has() { printf '%s' "$p" | grep -qE "$1"; }
 
-# --- The three INGEST.md rails (used to decide railed vs unrailed) -----------
+# --- The three rails (used to decide railed vs unrailed) ----------------------
 rail_brief=0; has '(no.inference|not verified|ground.truth|never infer|say not verified)' && rail_brief=1
-rail_chunk=0; has '(chunk|section [0-9]|one paper|single (paper|chapter|section)|pages? [0-9]+[ ]?(-|to|through)[ ]?[0-9]+)' && rail_chunk=1
+rail_chunk=0; has '(chunk|segment|section [0-9]|lesson [0-9]|unit [0-9]|one paper|single (paper|chapter|section|lesson|unit)|pages? [0-9]+[ ]?(-|to|through)[ ]?[0-9]+)' && rail_chunk=1
 rail_verify=0; has '(verif(y|ier|ied|ication)|spot.check|checked against|two.pass)' && rail_verify=1
 
 missing_rails() {
   local m=""
   [[ "$rail_brief"  -eq 0 ]] && m="$m a-no-inference-brief,"
-  [[ "$rail_chunk"  -eq 0 ]] && m="$m single-chunk-scope,"
+  [[ "$rail_chunk"  -eq 0 ]] && m="$m single-segment-scope,"
   [[ "$rail_verify" -eq 0 ]] && m="$m verification-requirement,"
   printf '%s' "${m%,}"
 }
 
-# --- BLOCK class 1: never delegated, rails or not -----------------------------
-banned=""
+# --- Classify pipeline work ---------------------------------------------------
+# "strict_only" marks the three kinds of work that the v2 policy never delegated.
+pipeline=""; strict_only=0
 if has 'calibrat(e|ing|ion)[^.]{0,50}(parameter|coefficient|prior|model)'; then
-  banned="parameter calibration"
+  pipeline="parameter calibration"; strict_only=1
 elif has 'will (itself )?be cited|final (cited|citable) text|write[^.]{0,40}(cited|citable) (text|section|prose)'; then
-  banned="writing text that will be cited"
+  pipeline="writing text that will be cited"; strict_only=1
 elif has '(final|full)[^.]{0,30}(citation|footnote)[^.]{0,30}audit|audit[^.]{0,40}(the draft|cited output|footnotes of)|data.lineage audit'; then
-  banned="the final citation / data-lineage audit of cited output"
+  pipeline="a citation / data-lineage audit of cited output"; strict_only=1
+elif has 'extract(ing|ion)?[^.]{0,60}(paper|pdf|source|article|chapter|textbook)|read[^.]{0,40}(pdf|paper|chapter)[^.]{0,60}(markdown|note|extract)'; then
+  pipeline="source extraction"
+elif has 'verif(y|ication)[^.]{0,50}(quote|citation|claim|markdown|extraction)[^.]{0,40}(against|vs)[^.]{0,30}(pdf|source|chunk|segment)'; then
+  pipeline="segment verification"
+elif has 'fix[^.]{0,60}(verifier|verify\.json|verification findings|not verified)'; then
+  pipeline="a segment fix"
 fi
-if [[ -n "$banned" ]]; then
-  echo "AGENT GATE: blocked. This spawn delegates $banned, which NO-INFERENCE.md never delegates, rails or not: it happens in the main thread where every step is visible. To override for this session only: AGENT_GATE=0." >&2
+
+# --- Strict mode: the v2 never-delegated list, opt-in --------------------------
+if [[ "$strict_only" -eq 1 && "${AGENT_GATE_STRICT:-0}" == "1" ]]; then
+  echo "AGENT GATE (strict): blocked. This spawn delegates $pipeline, which strict mode keeps in the main thread, rails or not. Unset AGENT_GATE_STRICT to allow it on rails, or AGENT_GATE=0 to disable the gate for this session." >&2
   exit 2
 fi
 
-# --- BLOCK class 2: extraction / chunk-verification, allowed only on rails ----
-pipeline=""
-if has 'extract(ing|ion)?[^.]{0,60}(paper|pdf|source|article|chapter|textbook)|read[^.]{0,40}(pdf|paper|chapter)[^.]{0,60}(markdown|note|extract)'; then
-  pipeline="source extraction"
-elif has 'verif(y|ication)[^.]{0,50}(quote|citation|claim|markdown|extraction)[^.]{0,40}(against|vs)[^.]{0,30}(pdf|source|chunk)'; then
-  pipeline="chunk verification"
-fi
+# --- BLOCK: pipeline work is allowed only on rails ----------------------------
 if [[ -n "$pipeline" ]]; then
   if [[ "$rail_brief" -eq 1 && "$rail_chunk" -eq 1 && "$rail_verify" -eq 1 ]]; then
-    : # fully railed ingestion spawn: allowed
+    : # fully railed create / verify / fix spawn: allowed
   else
-    echo "AGENT GATE: blocked. This spawn delegates $pipeline without the full INGEST.md rails. Missing:$(missing_rails). Re-spawn with the protocol brief verbatim, a single-chunk scope (chunk id + page range), and the independent-verification requirement, or do the work in the main thread. See the ingestion protocol (INGEST.md at the vault root). Session override: AGENT_GATE=0." >&2
+    echo "AGENT GATE: blocked. This spawn delegates $pipeline without the full rails. Missing:$(missing_rails). Re-spawn with the protocol brief verbatim, a single-segment scope (segment id + page range or section), and the independent-verification requirement (a verifier that is never the creator), or do the work in the main thread. See the create, verify, fix sequence in INGEST.md at the vault root. Session override: AGENT_GATE=0." >&2
     exit 2
   fi
 fi

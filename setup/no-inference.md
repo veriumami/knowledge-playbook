@@ -29,8 +29,8 @@ A sloppy note poisons every later session that reads it. When you extract a pape
 3. Output every equation exactly as written, with variable definitions and page numbers.
 4. Bibliographic details first (year, sample size, authors, journal, DOI); these are the most common hallucination.
 5. If the paper has no formal model, say so. Do not upgrade a descriptive paper into a regression paper. Do not invent table names, coefficients, or values.
-6. Two-pass: after corrections, re-read the markdown line by line against the PDF with page citations.
-7. One paper per context window. Compact between papers; if compaction hits mid-paper, restart that paper.
+6. Two-pass: after corrections, re-read the markdown line by line against the PDF with page citations. When agents do the work, the second pass belongs to a different agent than the first.
+7. One paper per context window. Compact between papers; if compaction hits mid-paper, restart that paper. Long papers are split into segments, one per agent.
 
 ## Citation audit template (run when a draft cites sources)
 
@@ -72,7 +72,7 @@ source that fails the policy can still be read, but claims resting on it are fla
 Ingestion runs at a user-chosen precision level (the dial in INGEST.md): cite-grade,
 working-grade, or a labeled SKIMMED index-grade. Lower levels save tokens by narrowing
 verification scope or depth, never by weakening the rules: a SKIMMED chunk cannot
-support a claim, and anything cited is cite-grade with the full main-thread audit.
+support a claim, and anything cited is cite-grade with the full citation audit.
 
 ## Complex questions start with sourcing
 
@@ -89,11 +89,19 @@ the model-default way of doing something.
 
 ## Hard rules for the pipeline
 
-- **Agents only on rails.** Delegating pipeline work to a sub-agent is allowed ONLY for
-  single-chunk extraction and single-chunk verification under the full rails of
-  INGEST.md (protocol brief verbatim, one chunk per agent, independent verifier, main-
-  thread spot-checks). Parameter calibration, writing text that will be cited, and the
-  FINAL citation audit of cited output are never delegated: they happen in the main
-  thread where every step is visible.
+- **Agents on rails: create, verify, fix.** Any pipeline step may be delegated to
+  sub-agents when the work is cut into small segments and each segment runs the full
+  sequence of INGEST.md. One agent creates the segment (an extraction, a drafted
+  section, a calibration script, an audit table). A second agent that is never the
+  creator verifies it against the sources. A fixer works only from the verifier's
+  findings, and the fixed items are verified again. Every spawn carries the protocol
+  brief verbatim and a single-segment scope. No category of work is banned from
+  delegation. Unrailed delegation is.
+- **The main thread signs off.** Agent verdicts are hypotheses. Before a segment is
+  marked done the main thread spot-checks it against the source on the schedule in
+  INGEST.md, and a failed spot-check sends the segment back through verify and fix.
+- **Segment size is the control.** A segment is one chunk, one lesson, one section, or
+  one audit batch small enough for a single context window. If an agent would need to
+  compact mid-segment, the segment is too big. Split it.
 - **Do not compute interactively. Write a script, then run it locally**, so the whole
   pipeline is reproducible end to end.

@@ -88,14 +88,15 @@ wires the hooks, and schedules the nightly polish with one command
 Linux needs a cron/systemd timer for the polish.
 
 Three more properties are wired in, not hoped for. An **agent gate** (a PreToolUse hook)
-runs on every sub-agent spawn: work the protocol never delegates (calibration,
-cited-text writing, the final citation audit) is refused outright, and extraction or
-verification spawns pass only on the full ingestion rails (protocol brief, single-chunk
-scope, independent verification). A **source-ingestion pipeline**
+runs on every sub-agent spawn: pipeline work (extraction, verification, fixes,
+calibration, cited-text drafting, citation audits) passes only on the full rails
+(protocol brief, single-segment scope, independent verification), and unrailed
+pipeline spawns are refused. A **source-ingestion pipeline**
 ([`setup/INGEST.md`](setup/INGEST.md)): drop a textbook or paper into a research folder
 and it is purpose-queried, appraised against your source policy, chunked with a
 manifest, extracted one chunk per railed agent, verified by an independent second
-agent, and spot-checked in the main thread, so the knowledge survives with nothing
+agent, fixed from that agent's findings, and spot-checked in the main thread, so the
+knowledge survives with nothing
 fabricated and nothing lost. And the vault is **personalized by interview, not
 template**: [`setup/ONBOARD.md`](setup/ONBOARD.md) has Claude ask about your field,
 goals, subfolders, source policy (types per purpose, citation floor for foundational

@@ -10,14 +10,17 @@ It also installs the kit, in tiers: **core** (brain, plus **agent-watchdog** whi
 gates every sub-agent spawn), **default** (council-simulation for adversarial second
 opinions), and **optional** (debugging-council, added with `BRAIN_SETUP_SKILLS=all`).
 The mandatory **no-inference protocol** (`NO-INFERENCE.md`) is auto-loaded via a root
-`CLAUDE.md`, and a **PreToolUse agent gate** enforces it deterministically: calibration,
-cited-text writing, and the final citation audit are never delegated; extraction and
-verification spawns pass only on the full `INGEST.md` rails (protocol brief,
-single-chunk scope, independent verification); research spawns missing a no-inference
-brief get a warning. Disable per-session with `AGENT_GATE=0`. Dropping a source
-document into a research folder triggers the **ingestion pipeline** (`INGEST.md`):
-purpose query, policy appraisal, chunk manifest, railed per-chunk extraction, and
-independent verification, so nothing is fabricated and nothing is lost.
+`CLAUDE.md`, and a **PreToolUse agent gate** enforces it deterministically: any pipeline
+spawn (extraction, verification, fixes, calibration, cited-text drafting, citation
+audits) passes only on the full `INGEST.md` rails (protocol brief, single-segment
+scope, independent verification). Research spawns missing a no-inference brief get a
+warning. No kind of work is banned from sub-agents as of kit 3.2. Disable the gate
+per-session with `AGENT_GATE=0`, or set `AGENT_GATE_STRICT=1` to restore the older
+policy that kept calibration, cited-text writing and the final citation audit in the
+main thread. Dropping a source document into a research folder triggers the
+**ingestion pipeline** (`INGEST.md`): purpose query, policy appraisal, chunk manifest,
+then a create, verify, fix agent sequence per segment with a main-thread spot-check,
+so nothing is fabricated and nothing is lost.
 
 It is honest by construction: entries record only what is verifiable (git commits, file
 counts, timestamps). It never invents outcomes, and machine entries are tagged

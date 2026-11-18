@@ -4,7 +4,7 @@ This playbook argues for a no-inference discipline
 ([02-no-inference-protocol](02-no-inference-protocol.md)). It would be
 self-defeating not to apply that discipline to itself. This is the ledger.
 
-Audited 2026-07-10 by a script that walks the repo and checks that every
+Audited 2026-07-10 and re-run 2026-11-18 (after the kit 3.2 agent-policy change) by a script that walks the repo and checks that every
 internal link, every GitHub citation (here and on the portfolio site), and
 every `sources/` manifest entry resolves to a real file. A manual
 spot-check then compared the specific figures quoted in the docs against
@@ -15,10 +15,10 @@ from the tree.
 
 | Check | Verified | Mismatch |
 |---|---:|---:|
-| Internal markdown links (relative paths, incl. `sources/`) | 137 | 0 |
-| `sources/README.md` manifest entries exist | 20 | 0 |
-| GitHub blob citations on the portfolio site HTML | 21 | 0 |
-| **Total** | **178** | **0** |
+| Internal markdown links (relative paths, incl. `sources/`) | 155 | 0 |
+| `sources/README.md` manifest entries exist | 21 | 0 |
+| GitHub blob citations on the portfolio site HTML | 15 | 0 |
+| **Total** | **191** | **0** |
 
 Every "source →" link on the site and every cross-link in the docs points
 at a file that exists in this repo. The portfolio site now spans eight pages

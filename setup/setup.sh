@@ -109,7 +109,7 @@ pre = hooks.setdefault("PreToolUse", [])
 pre = [g for g in pre if not any("agent_gate.sh" in h.get("command","") for h in g.get("hooks", []))]
 pre.append({"matcher": "Task|Agent", "hooks": [{"type": "command", "command": gate}]})
 hooks["PreToolUse"] = pre
-print("  wired PreToolUse (Task|Agent) -> agent_gate.sh (blocks banned pipeline spawns)")
+print("  wired PreToolUse (Task|Agent) -> agent_gate.sh (blocks unrailed pipeline spawns)")
 
 with open(path, "w") as f:
     json.dump(cfg, f, indent=2); f.write("\n")

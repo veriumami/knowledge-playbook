@@ -8,7 +8,7 @@ rule the system applies to PDFs vs markdowns.
 
 | Copy in this repo | Original location | What it is |
 |---|---|---|
-| `research-project-CLAUDE.md` | `Knowledge/Research Project/CLAUDE.md` | The ground-truth rules: source hierarchy, never-infer, citation-audit and pipeline-audit prompt templates, no agents, script-first |
+| `research-project-CLAUDE.md` | `Knowledge/Research Project/CLAUDE.md` | The ground-truth rules: source hierarchy, never-infer, citation-audit and pipeline-audit prompt templates, no agents (the original rule, superseded in the kit by create, verify, fix), script-first |
 | `literature-verification-protocol.md` | `Knowledge/Research Project/literature/Building Literature Reviews.md` | Literature Verification Protocol v2.5: the page-by-page, every-table-in-full method |
 | `sample-literature-note-allcott-2019.md` | `Knowledge/Research Project/literature/2_allcott_2019_food_deserts.md` | A finished literature markdown: page-cited findings, no inference |
 | `sample-math-reference-nested-logit.md` | `Knowledge/Research Project/literature/Math paper markdowns/REF_nested_logit_welfare_theory__SmallRosen1981_Train2009.md` | A math reference markdown: every equation with source, equation number, page; notation concordance |
@@ -25,6 +25,7 @@ rule the system applies to PDFs vs markdowns.
 | `exam-prep-SKILL.md` | `~/.claude/skills/exam-prep/SKILL.md` | The exam-prep skill definition (BUILD / ANSWER modes) |
 | `brain-SKILL.md` | `~/.claude/skills/brain/SKILL.md` | The brain skill definition (logbook, freshness checks, write-surface contract) |
 | `global-claude-rules.md` | `~/.claude/CLAUDE.md` | The personal-layer rules: empirical-proof skepticism, reference cases |
+| `ec-intermediate-README.md` | `Knowledge/Chinese/ec-intermediate/README.md` | The textbook-to-Anki pipeline: one agent per lesson, independent verify agents, fix agents, script gates, and the recorded verification status |
 | `anki-bridge-SPEC-excerpt.md` | `Knowledge/Chinese/anki-bridge/SPEC.md` (lines 1–60) | **Excerpt.** The markdown-as-message-bus design |
 | `tinytreads-pulse-excerpt.md` | `Knowledge/repos/tinytreads/pulse.md` (lines 1–45) | **Excerpt.** A real session snapshot with empirical validation notes |
 | `staacked-pulse-excerpt.md` | `Knowledge/repos/staacked/pulse.md` (lines 1–35) | **Excerpt.** The storefront logbook with the v1.6 design trail |

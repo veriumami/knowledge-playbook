@@ -1,6 +1,6 @@
 ---
 name: agent-watchdog
-description: Check on background agents, bash jobs, and zombie processes, AND enforce the no-inference protocol on agents. Use proactively when 2+ agents are in flight, user asks for status, after a long gap since the last tool call, or before ending a session. Detects stalled agents (>20 min idle), zombie nodriver/python processes, and runaway background bash jobs. Also enforces no-inference: flags agents spawned for verification/academic pipeline work (where the protocol bans agents) and scans agent deliverables for uncited claims before they can reach a source-of-truth document. Prefers investigate-and-nudge over kill-and-restart — the user has been explicit that unfinished work is usually salvageable. Run automatically at session-start when continuing prior work.
+description: Check on background agents, bash jobs, and zombie processes, AND enforce the no-inference protocol on agents. Use proactively when 2+ agents are in flight, user asks for status, after a long gap since the last tool call, or before ending a session. Detects stalled agents (>20 min idle), zombie nodriver/python processes, and runaway background bash jobs. Also enforces no-inference: flags agents doing verification/academic pipeline work without the create-verify-fix rails (protocol brief, single-segment scope, independent verifier) and scans agent deliverables for uncited claims before they can reach a source-of-truth document. Prefers investigate-and-nudge over kill-and-restart — the user has been explicit that unfinished work is usually salvageable. Run automatically at session-start when continuing prior work.
 ---
 
 # Agent Watchdog
@@ -37,26 +37,28 @@ Two rules, applied to every agent before its work is trusted. Both come straight
 
 ### 0. The deterministic layer: the spawn gate (no model discretion)
 
-Where the vault was installed with `setup.sh`, enforcement does not rely on this skill being invoked at all: a **PreToolUse hook** (`scripts/agent_gate.sh`, matcher `Task|Agent`) runs on every sub-agent spawn. Work that is never delegated (parameter calibration, cited-text writing, the FINAL citation/data-lineage audit) is **refused** outright. Extraction and chunk-verification spawns are **allowed only on the full INGEST.md rails** — a no-inference brief, single-chunk scope, and an independent-verification requirement — and refused otherwise with the missing rails named. Research-flavored spawns missing a no-inference brief get a **warning** and proceed. Session escape hatch: `AGENT_GATE=0`. The sections below are the judgment layer on top of that hard floor.
+Where the vault was installed with `setup.sh`, enforcement does not rely on this skill being invoked at all: a **PreToolUse hook** (`scripts/agent_gate.sh`, matcher `Task|Agent`) runs on every sub-agent spawn. Pipeline spawns (extraction, segment verification, segment fixes, parameter calibration, cited-text drafting, citation or data-lineage audits) are **allowed only on the full INGEST.md rails**: a no-inference brief, single-segment scope, and an independent-verification requirement. Without them the spawn is refused with the missing rails named. Research-flavored spawns missing a no-inference brief get a **warning** and proceed. Session switches: `AGENT_GATE=0` disables the gate, and `AGENT_GATE_STRICT=1` restores the pre-3.2 policy that refused calibration, cited-text writing and the final citation audit outright. The sections below are the judgment layer on top of that hard floor.
 
-### 1. Enforce the agent ban in the verification pipeline
+### 1. Enforce the rails in the verification pipeline
 
-The protocol allows delegation only on rails. Before accepting any agent, classify what it was spawned to do:
+No category of work is banned from agents (kit 3.2 removed the ban). Delegation is allowed on rails, as create, verify, fix sequences over small segments. Before accepting any agent, classify what it was spawned to do:
 
-- **Allowed**: read-only research, landscape/library surveys, code search, evidence-mining that returns cited findings for later verification; and RAILED ingestion per INGEST.md — single-chunk extraction or single-chunk verification carrying the protocol brief, one-chunk scope, and the independent-verification requirement (extractor and verifier are never the same agent; the main thread spot-checks a sample).
-- **Banned**: unrailed extraction or verification (missing any of the three rails), parameter calibration, writing anything that will itself be cited, and the FINAL citation/data-lineage audit of cited output. If an agent is doing this, that is the finding: stop it, and move the work to the main thread (or re-spawn it properly railed). Do not "rescue" its output into a source-of-truth file.
+- **Allowed**: read-only research, landscape/library surveys, code search, evidence-mining that returns cited findings for later verification; and any RAILED pipeline step per INGEST.md. That covers extraction, drafting text that will be cited, calibration by script, and citation or data-lineage audits, each cut to one segment per agent and carrying the protocol brief, the single-segment scope, and the independent-verification requirement. The creator and the verifier are never the same agent. A fixer works only from the verifier's findings and its fixes are verified again. The main thread spot-checks before sign-off.
+- **Off-protocol**: any pipeline step missing a rail. Typical cases: an agent handed a whole paper instead of a segment, a creator asked to check its own work, a fixer certifying its own fix, a segment marked done with no verify pass on disk. If an agent is doing this, that is the finding: stop it and re-spawn it properly railed. Do not "rescue" its output into a source-of-truth file. Run the missing verify pass first.
 
-A banned-work agent is a 🚫 `off-protocol` condition, and it outranks a stall. Report it even if the agent is happily "active."
+An unrailed pipeline agent is a 🚫 `off-protocol` condition, and it outranks a stall. Report it even if the agent is happily "active."
+
+**Check coverage, not just verdicts.** After a batch, list the segments and confirm each one has a verify result on disk. Agents die after writing, and a workflow summary that says "stuck" or "done" is itself a verdict to check against the files.
 
 ### 2. Citation discipline on the output agents ARE allowed to produce
 
-Nothing an agent asserts reaches a source-of-truth document until it is verified. When a permitted agent returns a deliverable (a report, or a markdown it wrote), run `scripts/compliance_scan.sh <file>` on that file, not on its JSONL. It is grep/wc only, so it never overflows context, and returns red-flag counts:
+Nothing an agent asserts reaches a source-of-truth document until it is verified. When an agent returns a deliverable (a report, or a markdown it wrote), run `scripts/compliance_scan.sh <file>` on that file, not on its JSONL. It is grep/wc only, so it never overflows context, and returns red-flag counts:
 
 - claim-like lines with no adjacent citation or source pointer,
 - absence of the VERIFIED / PARTIAL / NOT VERIFIED vocabulary where the task required it,
 - a high claim-to-citation ratio (assertions outrunning evidence).
 
-The scan **flags, it does not certify.** A flag means treat the whole deliverable as NOT VERIFIED until a main-thread citation audit clears it, which is just the protocol's own default applied to agents. A clean scan is necessary, not sufficient: still audit anything that will be cited.
+The scan **flags, it does not certify.** A flag means treat the whole deliverable as NOT VERIFIED until an independent verify pass and a main-thread spot-check clear it, which is just the protocol's own default applied to agents. A clean scan is necessary, not sufficient: still audit anything that will be cited.
 
 ## The probe (safe, no context overflow)
 
@@ -94,13 +96,16 @@ For each agent flagged `stuck`:
 Run this in parallel, for **every agent that has returned a deliverable** (not just stuck ones):
 
 ```
-├── Is the agent doing banned pipeline work (extraction / calibration / citation
-│   or data audit / anything that will be cited)?
-│   └── Yes → 🚫 off-protocol. Stop it. Do NOT merge its output. Redo in main thread.
+├── Is the agent doing pipeline work (extraction / calibration / citation or data
+│   audit / anything that will be cited) WITHOUT the rails (brief, single segment,
+│   independent verifier)?
+│   └── Yes → 🚫 off-protocol. Stop it. Do NOT merge its output. Re-spawn railed,
+│             or run the missing verify → fix → verify pass on what it produced.
 │
-└── Allowed work → run scripts/compliance_scan.sh on its deliverable.
-    ├── FLAG → treat the whole deliverable as NOT VERIFIED; require a main-thread
-    │          citation audit (or discard) before any of it lands in a source doc.
+└── Railed or non-pipeline work → run scripts/compliance_scan.sh on its deliverable.
+    ├── FLAG → treat the whole deliverable as NOT VERIFIED; require an independent
+    │          verify pass plus a main-thread spot-check (or discard) before any of
+    │          it lands in a source doc.
     └── OK   → still audit anything that will be cited; clean scan ≠ certified.
 ```
 
@@ -124,7 +129,7 @@ See `scripts/zombie_sweep.sh`.
 - Do not TaskStop an agent just because it's slow — only after investigation
 - Do not read an agent's full `.output` JSONL file — it will overflow context (the `wc`, `stat`, and `tail -1` commands are fine)
 - Do not auto-respawn a failed agent with the exact same prompt — include new context about why the first run failed, or you'll just reproduce the same stall
-- Do not merge, quote, or "rescue" an agent's output into a source-of-truth document if it was doing banned pipeline work, or if its compliance scan FLAGs, until a main-thread citation audit clears it. A live agent producing confident, uncited claims is a worse outcome than a dead one
+- Do not merge, quote, or "rescue" an agent's output into a source-of-truth document if it was doing unrailed pipeline work, or if its compliance scan FLAGs, until an independent verify pass and a main-thread spot-check clear it. A live agent producing confident, uncited claims is a worse outcome than a dead one
 
 ## Output format
 
@@ -137,7 +142,7 @@ When the watchdog runs, produce a compact report to the user:
 |---|---|---|---|
 | S9-... | 3m  | ✅ active | making progress |
 | S9-... | 24m | 🚨 stuck  | partial edits visible on <file>; recommend manual completion |
-| S9-... | 8m  | 🚫 off-protocol | doing citation extraction (banned); stop, redo in main thread |
+| S9-... | 8m  | 🚫 off-protocol | citation extraction with no verifier rail; stop, re-spawn railed |
 | S9-... | done | ⚠️ FLAG | deliverable has 14 claims, 0 citations; NOT VERIFIED until audited |
 
 Zombies: 0 (or N — with kill recommendation)

@@ -4,7 +4,7 @@
 # or overflows context.
 #
 # It FLAGS, it does not CERTIFY. Any flag means: treat the whole deliverable as
-# NOT VERIFIED until a main-thread citation audit clears it (the protocol's own
+# NOT VERIFIED until an independent citation audit clears it (the protocol's own
 # default, applied to agents). A clean result is necessary, not sufficient.
 #
 # Usage: compliance_scan.sh <deliverable-file>
@@ -38,7 +38,7 @@ if [[ "$verdict" == "OK" ]]; then
   echo "  verdict: OK  (no obvious red flags; still audit anything cited before it reaches a source-of-truth doc)"
   exit 0
 else
-  echo "  verdict: FLAG  (treat as NOT VERIFIED until a main-thread citation audit clears it)"
+  echo "  verdict: FLAG  (treat as NOT VERIFIED until an independent citation audit clears it)"
   for x in "${flags[@]}"; do echo "    - $x"; done
   exit 3
 fi

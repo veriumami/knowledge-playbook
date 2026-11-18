@@ -43,7 +43,8 @@ rule is not configurable.
 {{NEW_FILE_RULE: default = the INGEST.md pipeline: purpose query first, appraisal, chunk
 manifest, one railed agent per chunk (page-by-page, every table in full, equations
 verbatim with page numbers, NOT VERIFIED default), independent second-agent
-verification, main-thread spot-check. Tailor the examples to the field; never weaken
+verification, fixes from the verifier's findings then re-verified, main-thread
+spot-check. Tailor the examples to the field; never weaken
 the rules.}}
 
 ## Complex questions
